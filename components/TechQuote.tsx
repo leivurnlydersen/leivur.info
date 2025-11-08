@@ -59,13 +59,13 @@ export function TechQuote() {
 
   return (
     <div className="bg-card border border-card-border rounded-lg p-2 hover:border-accent/50 transition-colors">
-      <div className="flex items-center gap-1 mb-1.5">
+      <div className="flex items-center gap-1 mb-1">
         <Quote className="w-3 h-3 text-muted" />
         <h2 className="text-xs font-semibold">Quote of the Moment</h2>
       </div>
 
-      <div className="space-y-0.5">
-        <p className="text-xs italic leading-snug text-foreground/90 line-clamp-3">
+      <div>
+        <p className="text-xs italic leading-tight text-foreground/90 line-clamp-4 mb-1">
           "{currentQuote.text}"
         </p>
         <p className="text-xs text-muted text-right">

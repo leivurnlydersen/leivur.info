@@ -62,8 +62,8 @@ export function StockMovers() {
         // Sort by percent change
         const sorted = [...validStocks].sort((a, b) => Math.abs(b.changePercent) - Math.abs(a.changePercent));
 
-        const topGainers = sorted.filter(s => s.changePercent > 0).slice(0, 3);
-        const topLosers = sorted.filter(s => s.changePercent < 0).slice(0, 3);
+        const topGainers = sorted.filter(s => s.changePercent > 0).slice(0, 5);
+        const topLosers = sorted.filter(s => s.changePercent < 0).slice(0, 5);
 
         setGainers(topGainers);
         setLosers(topLosers);
@@ -119,31 +119,31 @@ export function StockMovers() {
 
   return (
     <div className="bg-card border border-card-border rounded-lg p-2 col-span-1 sm:col-span-2 xl:col-span-1 2xl:col-span-2 hover:border-accent/50 transition-colors">
-      <div className="flex items-center justify-between mb-1.5">
+      <div className="flex items-center justify-between mb-1">
         <div className="flex items-center gap-1">
           <Activity className="w-3 h-3 text-muted" />
           <h2 className="text-xs font-semibold">Today's Movers</h2>
         </div>
-        <div className="flex gap-1">
+        <div className="flex gap-0.5">
           <button
             onClick={() => setShowGainers(true)}
-            className={`text-xs px-1.5 py-0.5 rounded transition-colors ${
+            className={`text-xs px-1 py-0 rounded transition-colors ${
               showGainers
                 ? 'bg-green-500/20 text-green-500'
                 : 'text-muted hover:bg-accent/10'
             }`}
           >
-            Gainers
+            ▲
           </button>
           <button
             onClick={() => setShowGainers(false)}
-            className={`text-xs px-1.5 py-0.5 rounded transition-colors ${
+            className={`text-xs px-1 py-0 rounded transition-colors ${
               !showGainers
                 ? 'bg-red-500/20 text-red-500'
                 : 'text-muted hover:bg-accent/10'
             }`}
           >
-            Losers
+            ▼
           </button>
         </div>
       </div>
