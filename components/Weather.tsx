@@ -1,17 +1,15 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Cloud, CloudRain, CloudSnow, Sun, Wind, Droplets, Eye } from 'lucide-react';
+import { Cloud, CloudRain, CloudSnow, Sun, Wind, Droplets, MapPin } from 'lucide-react';
 
 interface WeatherData {
   temp: number;
-  feels_like: number;
   humidity: number;
   wind_speed: number;
   description: string;
   icon: string;
   city: string;
-  visibility: number;
 }
 
 export function Weather() {
@@ -22,22 +20,20 @@ export function Weather() {
   useEffect(() => {
     const fetchWeather = async () => {
       try {
-        const apiKey = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY;
-
-        if (!apiKey) {
-          setError('API key not configured');
-          setLoading(false);
-          return;
-        }
-
         // Get user's location
         if ('geolocation' in navigator) {
           navigator.geolocation.getCurrentPosition(
             async (position) => {
               const { latitude, longitude } = position.coords;
 
+              // Fetch from MET.no API (no key required!)
               const response = await fetch(
-                `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric`
+                `https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=${latitude.toFixed(2)}&lon=${longitude.toFixed(2)}`,
+                {
+                  headers: {
+                    'User-Agent': 'leivur.info personal-dashboard contact@leivur.info',
+                  },
+                }
               );
 
               if (!response.ok) {
@@ -45,16 +41,36 @@ export function Weather() {
               }
 
               const data = await response.json();
+              const current = data.properties.timeseries[0];
+              const details = current.data.instant.details;
+              const next1h = current.data.next_1_hours;
+
+              // Get city name via reverse geocoding
+              let cityName = 'Your Location';
+              try {
+                const geoResponse = await fetch(
+                  `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`,
+                  {
+                    headers: {
+                      'User-Agent': 'leivur.info personal-dashboard',
+                    },
+                  }
+                );
+                const geoData = await geoResponse.json();
+                cityName = geoData.address?.city || geoData.address?.town || geoData.address?.village || 'Your Location';
+              } catch {
+                // If geocoding fails, just use default
+              }
+
+              const weatherCode = next1h?.summary?.symbol_code || 'cloudy';
 
               setWeather({
-                temp: Math.round(data.main.temp),
-                feels_like: Math.round(data.main.feels_like),
-                humidity: data.main.humidity,
-                wind_speed: Math.round(data.wind.speed * 3.6), // Convert m/s to km/h
-                description: data.weather[0].description,
-                icon: data.weather[0].main,
-                city: data.name,
-                visibility: Math.round(data.visibility / 1000), // Convert to km
+                temp: Math.round(details.air_temperature),
+                humidity: Math.round(details.relative_humidity),
+                wind_speed: Math.round(details.wind_speed * 3.6), // Convert m/s to km/h
+                description: getWeatherDescription(weatherCode),
+                icon: weatherCode,
+                city: cityName,
               });
               setLoading(false);
             },
@@ -79,21 +95,32 @@ export function Weather() {
     return () => clearInterval(interval);
   }, []);
 
-  const getWeatherIcon = (icon: string) => {
+  const getWeatherDescription = (code: string): string => {
+    if (code.includes('clearsky')) return 'clear sky';
+    if (code.includes('fair')) return 'fair';
+    if (code.includes('partlycloudy')) return 'partly cloudy';
+    if (code.includes('cloudy')) return 'cloudy';
+    if (code.includes('rain')) return 'rain';
+    if (code.includes('snow')) return 'snow';
+    if (code.includes('sleet')) return 'sleet';
+    if (code.includes('fog')) return 'fog';
+    return 'cloudy';
+  };
+
+  const getWeatherIcon = (code: string) => {
     const iconClass = "w-8 h-8 text-accent";
-    switch (icon.toLowerCase()) {
-      case 'clear':
-        return <Sun className={iconClass} />;
-      case 'clouds':
-        return <Cloud className={iconClass} />;
-      case 'rain':
-      case 'drizzle':
-        return <CloudRain className={iconClass} />;
-      case 'snow':
-        return <CloudSnow className={iconClass} />;
-      default:
-        return <Cloud className={iconClass} />;
+    const icon = code.toLowerCase();
+
+    if (icon.includes('clearsky') || icon.includes('fair')) {
+      return <Sun className={iconClass} />;
     }
+    if (icon.includes('rain') || icon.includes('drizzle')) {
+      return <CloudRain className={iconClass} />;
+    }
+    if (icon.includes('snow') || icon.includes('sleet')) {
+      return <CloudSnow className={iconClass} />;
+    }
+    return <Cloud className={iconClass} />;
   };
 
   if (loading) {
@@ -127,7 +154,7 @@ export function Weather() {
   return (
     <div className="bg-card border border-card-border rounded-lg p-2 hover:border-accent/50 transition-colors">
       <div className="flex items-center gap-1 mb-1">
-        <Cloud className="w-3 h-3 text-muted" />
+        <MapPin className="w-3 h-3 text-muted" />
         <h2 className="text-xs font-semibold">{weather.city}</h2>
       </div>
 
@@ -147,13 +174,6 @@ export function Weather() {
         <div className="flex items-center gap-1">
           <Wind className="w-3 h-3 text-muted" />
           <span className="text-muted">{weather.wind_speed} km/h</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <Eye className="w-3 h-3 text-muted" />
-          <span className="text-muted">{weather.visibility} km</span>
-        </div>
-        <div className="text-muted">
-          Feels {weather.feels_like}°C
         </div>
       </div>
     </div>
