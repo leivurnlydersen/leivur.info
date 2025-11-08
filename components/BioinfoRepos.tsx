@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Github, Star, GitFork } from 'lucide-react';
+import { Dna, Star, GitFork } from 'lucide-react';
 
 interface Repository {
   name: string;
@@ -14,25 +14,24 @@ interface Repository {
   languageColor: string;
 }
 
-export function GitHubTrending() {
+export function BioinfoRepos() {
   const [repos, setRepos] = useState<Repository[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchTrending = async () => {
+    const fetchRepos = async () => {
       try {
-        // Using GitHub's search API to get trending repos (most starred in last week)
-        const today = new Date();
-        const lastWeek = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
-        const dateString = lastWeek.toISOString().split('T')[0];
+        // Search for bioinformatics-related repositories
+        const topics = ['bioinformatics', 'genomics', 'computational-biology'];
+        const topicQuery = topics.map(t => `topic:${t}`).join(' OR ');
 
         const response = await fetch(
-          `https://api.github.com/search/repositories?q=created:>${dateString}&sort=stars&order=desc&per_page=6`
+          `https://api.github.com/search/repositories?q=${encodeURIComponent(topicQuery)}&sort=stars&order=desc&per_page=6`
         );
 
         if (!response.ok) {
-          throw new Error('Failed to fetch trending repos');
+          throw new Error('Failed to fetch bioinformatics repos');
         }
 
         const data = await response.json();
@@ -51,31 +50,30 @@ export function GitHubTrending() {
         setRepos(reposData);
         setLoading(false);
       } catch (err) {
-        setError('Failed to load trending repos');
+        console.error('Bioinformatics repos error:', err);
+        setError('Failed to load repos');
         setLoading(false);
       }
     };
 
-    fetchTrending();
+    fetchRepos();
     // Refresh every 30 minutes
-    const interval = setInterval(fetchTrending, 1800000);
+    const interval = setInterval(fetchRepos, 1800000);
     return () => clearInterval(interval);
   }, []);
 
   const getLanguageColor = (language: string | null): string => {
     const colors: Record<string, string> = {
-      JavaScript: '#f1e05a',
-      TypeScript: '#3178c6',
       Python: '#3572A5',
+      R: '#198CE7',
       Java: '#b07219',
-      Go: '#00ADD8',
-      Rust: '#dea584',
-      Ruby: '#701516',
-      PHP: '#4F5D95',
       'C++': '#f34b7d',
       C: '#555555',
-      Swift: '#ffac45',
-      Kotlin: '#A97BFF',
+      Rust: '#dea584',
+      Julia: '#a270ba',
+      Perl: '#0298c3',
+      Shell: '#89e051',
+      JavaScript: '#f1e05a',
     };
     return colors[language || ''] || '#8b949e';
   };
@@ -91,8 +89,8 @@ export function GitHubTrending() {
     return (
       <div className="bg-card border border-card-border rounded-lg p-2 col-span-1 sm:col-span-2 xl:col-span-1 2xl:col-span-2">
         <div className="flex items-center gap-1 mb-1">
-          <Github className="w-3 h-3 text-muted" />
-          <h2 className="text-xs font-semibold">GitHub Trending</h2>
+          <Dna className="w-3 h-3 text-muted" />
+          <h2 className="text-xs font-semibold">Bioinformatics</h2>
         </div>
         <div className="h-32 flex items-center justify-center">
           <div className="text-muted text-xs">Loading...</div>
@@ -105,8 +103,8 @@ export function GitHubTrending() {
     return (
       <div className="bg-card border border-card-border rounded-lg p-2 col-span-1 sm:col-span-2 xl:col-span-1 2xl:col-span-2">
         <div className="flex items-center gap-1 mb-1">
-          <Github className="w-3 h-3 text-muted" />
-          <h2 className="text-xs font-semibold">GitHub Trending</h2>
+          <Dna className="w-3 h-3 text-muted" />
+          <h2 className="text-xs font-semibold">Bioinformatics</h2>
         </div>
         <div className="h-32 flex items-center justify-center">
           <div className="text-muted text-xs">{error || 'No repos'}</div>
@@ -118,8 +116,8 @@ export function GitHubTrending() {
   return (
     <div className="bg-card border border-card-border rounded-lg p-2 col-span-1 sm:col-span-2 xl:col-span-1 2xl:col-span-2 hover:border-accent/50 transition-colors">
       <div className="flex items-center gap-1 mb-1.5">
-        <Github className="w-3 h-3 text-muted" />
-        <h2 className="text-xs font-semibold">GitHub Trending - This Week</h2>
+        <Dna className="w-3 h-3 text-green-500" />
+        <h2 className="text-xs font-semibold">Bioinformatics - Top Repos</h2>
       </div>
 
       <div className="space-y-1.5">

@@ -89,7 +89,7 @@ export function StockMovers() {
 
   if (loading) {
     return (
-      <div className="bg-card border border-card-border rounded-lg p-2 col-span-1 sm:col-span-2">
+      <div className="bg-card border border-card-border rounded-lg p-2 col-span-1 sm:col-span-2 xl:col-span-1 2xl:col-span-2">
         <div className="flex items-center gap-1 mb-1">
           <Activity className="w-3 h-3 text-muted" />
           <h2 className="text-xs font-semibold">Stock Movers</h2>
@@ -103,7 +103,7 @@ export function StockMovers() {
 
   if (error) {
     return (
-      <div className="bg-card border border-card-border rounded-lg p-2 col-span-1 sm:col-span-2">
+      <div className="bg-card border border-card-border rounded-lg p-2 col-span-1 sm:col-span-2 xl:col-span-1 2xl:col-span-2">
         <div className="flex items-center gap-1 mb-1">
           <Activity className="w-3 h-3 text-muted" />
           <h2 className="text-xs font-semibold">Stock Movers</h2>
@@ -118,7 +118,7 @@ export function StockMovers() {
   const displayStocks = showGainers ? gainers : losers;
 
   return (
-    <div className="bg-card border border-card-border rounded-lg p-2 col-span-1 sm:col-span-2 hover:border-accent/50 transition-colors">
+    <div className="bg-card border border-card-border rounded-lg p-2 col-span-1 sm:col-span-2 xl:col-span-1 2xl:col-span-2 hover:border-accent/50 transition-colors">
       <div className="flex items-center justify-between mb-1.5">
         <div className="flex items-center gap-1">
           <Activity className="w-3 h-3 text-muted" />

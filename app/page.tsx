@@ -6,6 +6,8 @@ import { GitHubTrending } from '@/components/GitHubTrending';
 import { TechQuote } from '@/components/TechQuote';
 import { TechStocks } from '@/components/TechStocks';
 import { StockMovers } from '@/components/StockMovers';
+import { BioinfoRepos } from '@/components/BioinfoRepos';
+import { BiotechNews } from '@/components/BiotechNews';
 
 export default function Home() {
   return (
@@ -20,6 +22,8 @@ export default function Home() {
         <StockMovers />
         <HackerNews />
         <GitHubTrending />
+        <BioinfoRepos />
+        <BiotechNews />
       </div>
     </main>
   );
