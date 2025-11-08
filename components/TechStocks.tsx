@@ -29,20 +29,29 @@ export function TechStocks() {
         const symbols = ['AAPL', 'GOOGL', 'MSFT', 'NVDA', 'TSLA'];
 
         const stockPromises = symbols.map(async (symbol) => {
-          const response = await fetch(
-            `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${apiKey}`
-          );
-          const data = await response.json();
+          try {
+            const response = await fetch(
+              `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${apiKey}`
+            );
+            const data = await response.json();
 
-          return {
-            symbol,
-            price: data.c, // current price
-            change: data.d, // change
-            changePercent: data.dp, // change percent
-          };
+            // Validate data exists
+            if (data.c && data.d !== undefined && data.dp !== undefined) {
+              return {
+                symbol,
+                price: data.c, // current price
+                change: data.d, // change
+                changePercent: data.dp, // change percent
+              };
+            }
+            return null;
+          } catch {
+            return null;
+          }
         });
 
-        const stocksData = await Promise.all(stockPromises);
+        const results = await Promise.all(stockPromises);
+        const stocksData = results.filter((s): s is Stock => s !== null);
         setStocks(stocksData);
         setLoading(false);
       } catch (err) {
@@ -58,10 +67,16 @@ export function TechStocks() {
   }, []);
 
   const formatPrice = (price: number) => {
+    if (price === undefined || price === null || isNaN(price)) {
+      return '$-.--';
+    }
     return `$${price.toFixed(2)}`;
   };
 
   const formatChange = (change: number, changePercent: number) => {
+    if (changePercent === undefined || changePercent === null || isNaN(changePercent)) {
+      return <span className="text-xs text-muted">-</span>;
+    }
     const isPositive = change >= 0;
     return (
       <span className={`flex items-center gap-0.5 text-xs ${isPositive ? 'text-green-500' : 'text-red-500'}`}>

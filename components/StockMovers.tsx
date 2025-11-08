@@ -42,7 +42,7 @@ export function StockMovers() {
             );
             const data = await response.json();
 
-            if (data.c && data.d && data.dp) {
+            if (data.c && data.d !== undefined && data.dp !== undefined) {
               return {
                 symbol,
                 price: data.c,
@@ -81,6 +81,9 @@ export function StockMovers() {
   }, []);
 
   const formatPrice = (price: number) => {
+    if (price === undefined || price === null || isNaN(price)) {
+      return '$-.--';
+    }
     return `$${price.toFixed(2)}`;
   };
 
