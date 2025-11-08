@@ -24,59 +24,130 @@ export function Weather() {
         if ('geolocation' in navigator) {
           navigator.geolocation.getCurrentPosition(
             async (position) => {
-              const { latitude, longitude } = position.coords;
-
-              // Fetch from MET.no API (no key required!)
-              const response = await fetch(
-                `https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=${latitude.toFixed(2)}&lon=${longitude.toFixed(2)}`,
-                {
-                  headers: {
-                    'User-Agent': 'leivur.info personal-dashboard contact@leivur.info',
-                  },
-                }
-              );
-
-              if (!response.ok) {
-                throw new Error('Failed to fetch weather');
-              }
-
-              const data = await response.json();
-              const current = data.properties.timeseries[0];
-              const details = current.data.instant.details;
-              const next1h = current.data.next_1_hours;
-
-              // Get city name via reverse geocoding
-              let cityName = 'Your Location';
               try {
-                const geoResponse = await fetch(
-                  `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`,
+                const { latitude, longitude } = position.coords;
+
+                // Fetch from MET.no API (no key required!)
+                const response = await fetch(
+                  `https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=${latitude.toFixed(2)}&lon=${longitude.toFixed(2)}`,
                   {
                     headers: {
-                      'User-Agent': 'leivur.info personal-dashboard',
+                      'User-Agent': 'leivur.info personal-dashboard contact@leivur.info',
                     },
                   }
                 );
-                const geoData = await geoResponse.json();
-                cityName = geoData.address?.city || geoData.address?.town || geoData.address?.village || 'Your Location';
-              } catch {
-                // If geocoding fails, just use default
+
+                if (!response.ok) {
+                  throw new Error(`Weather API error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const current = data.properties.timeseries[0];
+                const details = current.data.instant.details;
+                const next1h = current.data.next_1_hours;
+
+                // Get city name via reverse geocoding
+                let cityName = 'Your Location';
+                try {
+                  const geoResponse = await fetch(
+                    `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`,
+                    {
+                      headers: {
+                        'User-Agent': 'leivur.info personal-dashboard',
+                      },
+                    }
+                  );
+                  const geoData = await geoResponse.json();
+                  cityName = geoData.address?.city || geoData.address?.town || geoData.address?.village || 'Your Location';
+                } catch {
+                  // If geocoding fails, just use default
+                }
+
+                const weatherCode = next1h?.summary?.symbol_code || 'cloudy';
+
+                setWeather({
+                  temp: Math.round(details.air_temperature),
+                  humidity: Math.round(details.relative_humidity),
+                  wind_speed: Math.round(details.wind_speed * 3.6), // Convert m/s to km/h
+                  description: getWeatherDescription(weatherCode),
+                  icon: weatherCode,
+                  city: cityName,
+                });
+                setLoading(false);
+              } catch (err) {
+                console.error('Weather fetch error:', err);
+                setError('Failed to fetch weather data');
+                setLoading(false);
+              }
+            },
+            async (geoError) => {
+              console.error('Geolocation error:', geoError);
+
+              // Try IP-based geolocation as fallback
+              try {
+                console.log('Trying IP-based geolocation fallback...');
+                const ipResponse = await fetch('https://ipapi.co/json/');
+                const ipData = await ipResponse.json();
+
+                if (ipData.latitude && ipData.longitude) {
+                  console.log('Got location from IP:', ipData.city);
+                  const { latitude, longitude } = ipData;
+
+                  // Fetch weather with IP-based location
+                  const response = await fetch(
+                    `https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=${latitude.toFixed(2)}&lon=${longitude.toFixed(2)}`,
+                    {
+                      headers: {
+                        'User-Agent': 'leivur.info personal-dashboard contact@leivur.info',
+                      },
+                    }
+                  );
+
+                  if (!response.ok) {
+                    throw new Error(`Weather API error: ${response.status}`);
+                  }
+
+                  const data = await response.json();
+                  const current = data.properties.timeseries[0];
+                  const details = current.data.instant.details;
+                  const next1h = current.data.next_1_hours;
+                  const weatherCode = next1h?.summary?.symbol_code || 'cloudy';
+
+                  setWeather({
+                    temp: Math.round(details.air_temperature),
+                    humidity: Math.round(details.relative_humidity),
+                    wind_speed: Math.round(details.wind_speed * 3.6),
+                    description: getWeatherDescription(weatherCode),
+                    icon: weatherCode,
+                    city: ipData.city || 'Your Location',
+                  });
+                  setLoading(false);
+                  return;
+                }
+              } catch (fallbackError) {
+                console.error('IP geolocation fallback failed:', fallbackError);
               }
 
-              const weatherCode = next1h?.summary?.symbol_code || 'cloudy';
-
-              setWeather({
-                temp: Math.round(details.air_temperature),
-                humidity: Math.round(details.relative_humidity),
-                wind_speed: Math.round(details.wind_speed * 3.6), // Convert m/s to km/h
-                description: getWeatherDescription(weatherCode),
-                icon: weatherCode,
-                city: cityName,
-              });
+              // If fallback also fails, show error
+              let errorMessage = 'Location error';
+              switch (geoError.code) {
+                case geoError.PERMISSION_DENIED:
+                  errorMessage = 'Location access denied';
+                  break;
+                case geoError.POSITION_UNAVAILABLE:
+                  errorMessage = 'Location unavailable';
+                  break;
+                case geoError.TIMEOUT:
+                  errorMessage = 'Location timeout';
+                  break;
+              }
+              setError(errorMessage);
               setLoading(false);
             },
-            (error) => {
-              setError('Location access denied');
-              setLoading(false);
+            {
+              timeout: 10000, // 10 second timeout
+              enableHighAccuracy: false, // Faster, less accurate
+              maximumAge: 300000, // Cache position for 5 minutes
             }
           );
         } else {
@@ -84,6 +155,7 @@ export function Weather() {
           setLoading(false);
         }
       } catch (err) {
+        console.error('Weather component error:', err);
         setError('Failed to load weather');
         setLoading(false);
       }
