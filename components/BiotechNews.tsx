@@ -21,7 +21,7 @@ export function BiotechNews() {
         // Using RSS2JSON to fetch biotech news from FierceBiotech
         const rssUrl = 'https://www.fiercebiotech.com/rss/xml';
         const response = await fetch(
-          `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}&count=8`
+          `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`
         );
 
         if (!response.ok) {
@@ -34,7 +34,7 @@ export function BiotechNews() {
           throw new Error('RSS feed error');
         }
 
-        const newsItems: NewsItem[] = data.items.map((item: any) => ({
+        const newsItems: NewsItem[] = data.items.slice(0, 8).map((item: any) => ({
           title: item.title,
           link: item.link,
           pubDate: item.pubDate,

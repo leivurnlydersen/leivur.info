@@ -23,11 +23,9 @@ export function BioinfoRepos() {
     const fetchRepos = async () => {
       try {
         // Search for bioinformatics-related repositories
-        const topics = ['bioinformatics', 'genomics', 'computational-biology'];
-        const topicQuery = topics.map(t => `topic:${t}`).join(' OR ');
-
+        // Using keywords in description/readme instead of topics
         const response = await fetch(
-          `https://api.github.com/search/repositories?q=${encodeURIComponent(topicQuery)}&sort=stars&order=desc&per_page=6`
+          `https://api.github.com/search/repositories?q=bioinformatics+genomics+in:description,readme&sort=stars&order=desc&per_page=6`
         );
 
         if (!response.ok) {
