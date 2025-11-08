@@ -65,7 +65,7 @@ export function TechQuote() {
       </div>
 
       <div>
-        <p className="text-xs italic leading-tight text-foreground/90 line-clamp-4 mb-1">
+        <p className="text-xs italic leading-tight text-foreground/90 line-clamp-3 mb-1">
           "{currentQuote.text}"
         </p>
         <p className="text-xs text-muted text-right">

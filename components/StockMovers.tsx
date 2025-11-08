@@ -62,8 +62,8 @@ export function StockMovers() {
         // Sort by percent change
         const sorted = [...validStocks].sort((a, b) => Math.abs(b.changePercent) - Math.abs(a.changePercent));
 
-        const topGainers = sorted.filter(s => s.changePercent > 0).slice(0, 5);
-        const topLosers = sorted.filter(s => s.changePercent < 0).slice(0, 5);
+        const topGainers = sorted.filter(s => s.changePercent > 0).slice(0, 4);
+        const topLosers = sorted.filter(s => s.changePercent < 0).slice(0, 4);
 
         setGainers(topGainers);
         setLosers(topLosers);
