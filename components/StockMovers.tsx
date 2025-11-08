@@ -62,8 +62,8 @@ export function StockMovers() {
         // Sort by percent change
         const sorted = [...validStocks].sort((a, b) => Math.abs(b.changePercent) - Math.abs(a.changePercent));
 
-        const topGainers = sorted.filter(s => s.changePercent > 0).slice(0, 5);
-        const topLosers = sorted.filter(s => s.changePercent < 0).slice(0, 5);
+        const topGainers = sorted.filter(s => s.changePercent > 0).slice(0, 3);
+        const topLosers = sorted.filter(s => s.changePercent < 0).slice(0, 3);
 
         setGainers(topGainers);
         setLosers(topLosers);
@@ -148,7 +148,7 @@ export function StockMovers() {
         </div>
       </div>
 
-      <div className="space-y-1">
+      <div className="space-y-0.5">
         {displayStocks.length === 0 ? (
           <div className="text-xs text-muted text-center py-4">
             No {showGainers ? 'gainers' : 'losers'} found

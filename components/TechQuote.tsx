@@ -64,8 +64,8 @@ export function TechQuote() {
         <h2 className="text-xs font-semibold">Quote of the Moment</h2>
       </div>
 
-      <div className="space-y-1">
-        <p className="text-xs italic leading-relaxed text-foreground/90">
+      <div className="space-y-0.5">
+        <p className="text-xs italic leading-snug text-foreground/90 line-clamp-3">
           "{currentQuote.text}"
         </p>
         <p className="text-xs text-muted text-right">
