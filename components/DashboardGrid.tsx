@@ -158,20 +158,6 @@ export function DashboardGrid() {
   // Filter to only show enabled widgets
   const visibleWidgets = widgets.filter((id) => enabledWidgets.has(id));
 
-  // Prevent hydration mismatch
-  if (!mounted) {
-    return (
-      <>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-2 auto-rows-min">
-          {DEFAULT_WIDGETS.map((widgetId) => {
-            const WidgetComponent = WIDGET_COMPONENTS[widgetId as keyof typeof WIDGET_COMPONENTS];
-            return <WidgetComponent key={widgetId} />;
-          })}
-        </div>
-      </>
-    );
-  }
-
   return (
     <>
       <Settings
@@ -181,24 +167,34 @@ export function DashboardGrid() {
         allWidgets={allWidgetsMetadata}
       />
 
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-      >
-        <SortableContext items={visibleWidgets} strategy={rectSortingStrategy}>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-2 auto-rows-min">
-            {visibleWidgets.map((widgetId) => {
-              const WidgetComponent = WIDGET_COMPONENTS[widgetId as keyof typeof WIDGET_COMPONENTS];
-              return (
-                <SortableWidget key={widgetId} id={widgetId}>
-                  <WidgetComponent />
-                </SortableWidget>
-              );
-            })}
-          </div>
-        </SortableContext>
-      </DndContext>
+      {/* Prevent hydration mismatch for drag-and-drop */}
+      {!mounted ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-2 auto-rows-min">
+          {DEFAULT_WIDGETS.map((widgetId) => {
+            const WidgetComponent = WIDGET_COMPONENTS[widgetId as keyof typeof WIDGET_COMPONENTS];
+            return <WidgetComponent key={widgetId} />;
+          })}
+        </div>
+      ) : (
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext items={visibleWidgets} strategy={rectSortingStrategy}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-2 auto-rows-min">
+              {visibleWidgets.map((widgetId) => {
+                const WidgetComponent = WIDGET_COMPONENTS[widgetId as keyof typeof WIDGET_COMPONENTS];
+                return (
+                  <SortableWidget key={widgetId} id={widgetId}>
+                    <WidgetComponent />
+                  </SortableWidget>
+                );
+              })}
+            </div>
+          </SortableContext>
+        </DndContext>
+      )}
     </>
   );
 }
