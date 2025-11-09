@@ -29,10 +29,10 @@ export function Settings({ onWidgetToggle, onResetLayout, enabledWidgets, allWid
       {/* Settings Button */}
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed top-4 right-16 bg-card border border-card-border rounded-lg p-2 hover:border-accent/50 transition-colors shadow-lg z-50"
+        className="fixed top-4 right-16 p-2 rounded-lg bg-card border border-card-border hover:bg-accent/10 transition-colors z-50"
         aria-label="Open settings"
       >
-        <SettingsIcon className="w-5 h-5" />
+        <SettingsIcon className="w-5 h-5 text-foreground" />
       </button>
 
       {/* Settings Panel */}
