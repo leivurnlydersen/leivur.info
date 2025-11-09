@@ -23,7 +23,6 @@ export function SortableWidget({ id, children }: SortableWidgetProps) {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
-    cursor: isDragging ? 'grabbing' : 'grab',
   };
 
   return (
@@ -32,7 +31,7 @@ export function SortableWidget({ id, children }: SortableWidgetProps) {
       style={style}
       {...attributes}
       {...listeners}
-      className="touch-none"
+      className={`touch-none ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
     >
       {children}
     </div>
