@@ -1,8 +1,23 @@
-# leivur.info - Personal Dashboard
+# leivur.info - Personal Website & Dashboard
 
-A minimalistic, information-dense personal dashboard built with Next.js 14, featuring real-time data updates and a clean, responsive design.
+A stunning personal landing page with 3D animations and an information-dense dashboard built with Next.js 16, featuring real-time data updates, drag-and-drop customization, and a clean, responsive design.
 
-## 🚀 Features
+## ✨ Overview
+
+This project features two main sections:
+- **Landing Page** (`/`) - Eye-catching 3D animated hero page with glassmorphism
+- **Dashboard** (`/dashboard`) - Customizable personal dashboard with live data widgets
+
+## 🎨 Landing Page Features
+
+- **3D Animated Background** - Interactive network visualization using Vanta.js
+- **Glassmorphic Design** - Modern frosted glass effect with blur
+- **Smooth Animations** - Framer Motion powered fade-in effects
+- **Gradient Typography** - Beautiful color gradients on text
+- **Social Links** - GitHub, LinkedIn, Email with hover effects
+- **Responsive Design** - Perfect on mobile, tablet, and desktop
+
+## 🚀 Dashboard Features
 
 ### Live Data Widgets
 
@@ -17,8 +32,11 @@ A minimalistic, information-dense personal dashboard built with Next.js 14, feat
 - **Biotech News** - Latest biotech news from FierceBiotech
 - **Tech Quote** - Rotating programming quotes
 
-### Design Features
+### Customization Features
 
+- 🎨 **Drag-and-Drop** - Rearrange widgets by dragging them
+- ⚙️ **Settings Panel** - Toggle widget visibility, reset layout
+- 💾 **LocalStorage Persistence** - Your layout and preferences are saved
 - ✨ **Dark/Light Mode Toggle** - Automatic theme switching
 - 📱 **Fully Responsive** - Optimized for mobile, tablet, desktop, and ultrawide displays
 - 🎯 **Information Dense** - Tight spacing, maximum data per screen
@@ -27,9 +45,12 @@ A minimalistic, information-dense personal dashboard built with Next.js 14, feat
 
 ## 🛠 Tech Stack
 
-- **Framework**: Next.js 14 (App Router)
+- **Framework**: Next.js 16 (App Router)
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS v4
+- **3D Graphics**: Vanta.js + Three.js
+- **Animations**: Framer Motion
+- **Drag & Drop**: @dnd-kit
 - **Theme**: next-themes
 - **Icons**: lucide-react
 - **Deployment**: Vercel
@@ -107,9 +128,41 @@ npm start
 
 ## 🎨 Customization
 
+### Customizing the Landing Page
+
+**Change your information** in `app/page.tsx`:
+- Line 31: Your name
+- Line 40: Your title/tagline
+- Line 51-52: Your bio
+- Line 63, 71, 79: Social links (GitHub, LinkedIn, Email)
+
+**Change 3D background** in `components/VantaBackground.tsx`:
+- `color: 0x3b82f6` - Change to any hex color
+- `points: 10.0` - Number of nodes
+- `spacing: 18.0` - Distance between nodes
+- Replace with other effects: `vanta.waves.min.js`, `vanta.birds.min.js`, etc.
+
+**Change colors and animations:**
+- Gradient text: `from-blue-400 via-purple-400 to-pink-400`
+- Button gradient: `from-blue-500 to-purple-600`
+- Animation speed: Change `duration` values in motion components
+
+### Dashboard Customization
+
+**Using the Settings Panel:**
+- Click the gear icon (top-right, next to theme toggle)
+- Toggle widgets on/off with the eye icon
+- Click "Reset Layout to Default" to restore original arrangement
+- Your preferences save automatically to localStorage
+
+**Drag-and-Drop:**
+- Hover over any widget to see the grab cursor
+- Click and drag to rearrange
+- Layout saves automatically
+
 ### Adding New Widgets
 
-Create a new component in `components/`:
+1. Create a new component in `components/`:
 
 ```tsx
 'use client';
@@ -127,12 +180,32 @@ export function MyWidget() {
 }
 ```
 
-Add to `app/page.tsx`:
+2. Add to `components/DashboardGrid.tsx`:
 
 ```tsx
-import { MyWidget } from '@/components/MyWidget';
-// ... add to grid
+// Import your widget
+import { MyWidget } from './MyWidget';
+
+// Add to WIDGET_COMPONENTS (line 33)
+const WIDGET_COMPONENTS = {
+  // ... existing widgets
+  myWidget: MyWidget,
+};
+
+// Add to WIDGET_NAMES (line 46)
+const WIDGET_NAMES = {
+  // ... existing names
+  myWidget: 'My Widget',
+};
+
+// Add to DEFAULT_WIDGETS (line 60)
+const DEFAULT_WIDGETS = [
+  // ... existing widgets
+  'myWidget',
+];
 ```
+
+Your new widget will now appear in the dashboard with drag-and-drop and visibility toggle support!
 
 ### Responsive Breakpoints
 
@@ -166,10 +239,16 @@ className="col-span-1 sm:col-span-2 xl:col-span-1 2xl:col-span-2"
 leivur.info/
 ├── app/
 │   ├── layout.tsx          # Root layout with theme provider
-│   ├── page.tsx            # Main dashboard page
+│   ├── page.tsx            # Landing page with 3D background
+│   ├── dashboard/
+│   │   └── page.tsx        # Dashboard with widgets
 │   ├── globals.css         # Global styles & CSS variables
 │   └── api/                # API routes (if needed)
 ├── components/
+│   ├── VantaBackground.tsx # 3D animated background
+│   ├── DashboardGrid.tsx   # Dashboard grid with drag-and-drop
+│   ├── SortableWidget.tsx  # Wrapper for draggable widgets
+│   ├── Settings.tsx        # Settings panel
 │   ├── Clock.tsx           # Real-time clock widget
 │   ├── Weather.tsx         # Weather widget
 │   ├── Crypto.tsx          # Cryptocurrency prices
@@ -190,11 +269,29 @@ leivur.info/
 
 ## 🎯 Design Philosophy
 
+- **Visual Impact**: Eye-catching 3D animations and modern design
 - **Information Density**: Maximum useful data, minimum wasted space
 - **Performance**: Fast loading, efficient updates
 - **Simplicity**: Clean design, no clutter
+- **Customizability**: Drag-and-drop, settings, full control
 - **Accessibility**: Proper semantics, keyboard navigation
 - **Privacy**: No tracking, minimal external dependencies
+
+## 🔗 Routes
+
+- `/` - Landing page with 3D animated background
+- `/dashboard` - Customizable dashboard with live widgets
+
+## ⌨️ Keyboard Shortcuts
+
+**Dashboard:**
+- **ESC** - Close settings panel
+- **Tab** - Navigate between widgets and buttons
+- **Arrow Keys** - Navigate sortable widgets (when focused)
+
+**Landing Page:**
+- **Tab** - Navigate social links and button
+- **Enter** - Activate focused button/link
 
 ## 🤝 Contributing
 
